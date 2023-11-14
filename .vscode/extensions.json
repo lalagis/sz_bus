@@ -1,0 +1,11 @@
+{
+  "recommendations": [
+    // eslint
+    "dbaeumer.vscode-eslint",
+    // unocss
+    "antfu.unocss-vscode",
+    // volar
+    "johnsoncodehk.volar"
+  ],
+  "unwantedRecommendations": []
+}
