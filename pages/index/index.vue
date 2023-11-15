@@ -9,7 +9,7 @@ const config = useConfigStore()
       class="absolute inset-0"
       :options="config.mapboxOptions"
     >
-      <div />
+      <sources-and-layers />
     </mapbox-map>
   </div>
 </template>

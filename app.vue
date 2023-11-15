@@ -2,7 +2,10 @@
 import '@unocss/reset/tailwind.css'
 
 useHead({
-  title: 'AOI_finder',
+  title: 'sz_bus',
+  link: [
+    { rel: 'icon', type: 'image/x-icon', href: '/icon.svg' },
+  ],
 })
 </script>
 
