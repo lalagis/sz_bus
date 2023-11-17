@@ -2,7 +2,8 @@ import { defineStore } from 'pinia'
 import type { Feature, FeatureCollection } from 'geojson'
 
 export const useStopStore = defineStore('stop', () => {
-  const stops = $ref<FeatureCollection>({
+  const stops = $ref<Stop[]>([])
+  const stopsGeoJSON = $ref<FeatureCollection>({
     type: 'FeatureCollection',
     features: [],
   })
@@ -13,6 +14,7 @@ export const useStopStore = defineStore('stop', () => {
     if (csv.body) {
       // @ts-expect-error has body
       csv.body.forEach((stop: Stop) => {
+        stops.push(stop)
         const { route_id, line_name, route_name, station_index, station_id, station_name, lng, lat } = stop
         const item: Feature = {
           type: 'Feature',
@@ -29,7 +31,7 @@ export const useStopStore = defineStore('stop', () => {
             coordinates: [Number.parseFloat(lng), Number.parseFloat(lat)],
           },
         }
-        stops.features.push(item)
+        stopsGeoJSON.features.push(item)
       })
     }
     loaded = true
@@ -37,6 +39,7 @@ export const useStopStore = defineStore('stop', () => {
 
   return $$({
     stops,
+    stopsGeoJSON,
     loaded,
   })
 })

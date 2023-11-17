@@ -1,42 +1,116 @@
 <script setup lang="ts">
 const buslineStore = useBuslineStore()
-const { buslines, selectedBusline, loaded } = $(storeToRefs(buslineStore))
+const { buslines } = $(storeToRefs(buslineStore))
 
-const mode = $ref<'buslines' | 'stops'>('buslines')
+const stopStore = useStopStore()
+const { stops } = $(storeToRefs(stopStore))
 
-const searching = $ref(false)
-const query = $ref('')
+let mode = $ref<'buslines' | 'stops'>('buslines')
+
+let searching = $ref(false)
+let query = $ref('')
+
+const buslinesList = $computed(() => {
+  if (!buslines)
+    return []
+  if (!query)
+    return buslines
+  return buslines.filter(item => item.line_name.includes(query) || item.first_station.includes(query) || item.last_station.includes(query))
+})
+
+const stopsList = $computed(() => {
+  if (!stops)
+    return []
+  if (!query)
+    return stops
+  return stops.filter(item => item.station_name.includes(query))
+})
+
+let page = $ref(1)
+let currentBuslines = $ref<Busline[]>([])
+let currentStops = $ref<Stop[]>([])
+
+watchEffect(() => {
+  if (page) {
+    if (mode === 'buslines' && buslinesList.length)
+      currentBuslines = buslinesList.slice((page - 1) * 6, page * 6)
+
+    else if (mode === 'stops' && stopsList.length)
+      currentStops = stopsList.slice((page - 1) * 12, page * 12)
+  }
+})
+
+function onClickReset() {
+  query = ''
+  page = 1
+}
+
+function onToggleMode(incoming: 'buslines' | 'stops') {
+  query = ''
+  searching = false
+  mode = incoming
+  page = 1
+}
 </script>
 
 <template>
-  <div v-auto-animate class="fixed z-10 bg-white rounded-md mt-16 w-[50vw] inset-x-0 mx-auto px-8 py-6 flex flex-row items-center shadow-md">
+  <div v-auto-animate class="fixed z-10 bg-white rounded-md mt-16 w-[50vw] min-w-4xl inset-x-0 mx-auto px-8 py-6 flex flex-row items-center shadow-md overflow-hidden">
     <!-- mode -->
-    <div v-auto-animate class="w-30 h-30 bg-emerald-100 rounded-md">
+    <div v-auto-animate class="w-30 h-30 bg-emerald-100 rounded-md flex-none">
       <div
         class="absolute cursor-pointer transition-all duration-300"
         :class="mode === 'buslines' ? 'top-0 left-0 w-full h-full p-0 hover:bg-emerald-400 rounded-md' : 'bottom-0 right-0 w-2/5 h-2/5 bg-emerald-300 rounded-rb-md hover:scale-110 z-10 p-1'"
-        @click="mode = 'buslines'"
+        @click="onToggleMode('buslines')"
       >
         <div class="i-fluent-emoji-flat:bus w-full h-full" />
       </div>
       <div
         class="absolute cursor-pointer transition-all duration-300"
         :class="mode === 'stops' ? 'top-0 left-0 w-full h-full p-0 hover:bg-emerald-400 rounded-md' : 'bottom-0 right-0 w-2/5 h-2/5 bg-emerald-300 rounded-rb-md hover:scale-110 z-10 p-1'"
-        @click="mode = 'stops'"
+        @click="onToggleMode('stops')"
       >
         <div class="i-fluent-emoji-flat:bus-stop w-full h-full" />
       </div>
     </div>
 
     <!-- tools -->
-    <div class="ml-8 grid grid-cols-2 grid-rows-2 gap-y-4 gap-x-6">
+    <div class="ml-8 grid grid-cols-2 grid-rows-2 gap-y-4 gap-x-6 mr-6 flex-none">
       <div
         class="i-akar-icons:search w-12 h-12 bg-emerald-300 cursor-pointer hover:scale-105 hover:bg-emerald-400 transition-all duration-300"
         @click="searching = !searching"
       />
-      <div class="i-akar-icons:arrow-left-thick w-12 h-12 bg-emerald-300 cursor-pointer hover:scale-105 hover:bg-emerald-400 transition-all duration-300" />
-      <div class="i-akar-icons:arrow-counter-clockwise w-12 h-12 bg-emerald-300 cursor-pointer hover:scale-105 hover:bg-emerald-400 transition-all duration-300" />
-      <div class="i-akar-icons:arrow-right-thick w-12 h-12 bg-emerald-300 cursor-pointer hover:scale-105 hover:bg-emerald-400 transition-all duration-300" />
+      <div
+        v-if="page > 1"
+        class="i-akar-icons:arrow-left-thick w-12 h-12 bg-emerald-300 cursor-pointer hover:scale-105 hover:bg-emerald-400 transition-all duration-300"
+        @click="page--"
+      />
+      <div
+        class="i-akar-icons:arrow-counter-clockwise w-12 h-12 bg-emerald-300 cursor-pointer hover:scale-105 hover:bg-emerald-400 transition-all duration-300"
+        @click="onClickReset"
+      />
+      <div
+        v-if="mode === 'buslines' ? (buslinesList && page * 6 + 1 <= buslinesList.length) : (stopsList && page * 12 + 1 <= stopsList.length)"
+        class="i-akar-icons:arrow-right-thick w-12 h-12 bg-emerald-300 cursor-pointer hover:scale-105 hover:bg-emerald-400 transition-all duration-300"
+        @click="page++"
+      />
+    </div>
+
+    <!-- buslines 3*2 -->
+    <div
+      v-if="mode === 'buslines' && buslinesList.length"
+      v-auto-animate
+      class="grid grid-rows-3 grid-cols-2 gap-x-6 gap-y-3"
+    >
+      <busline-item v-for="busline in currentBuslines" :key="`busline${busline.route_id}`" :busline="busline" />
+    </div>
+
+    <!-- stops 3*4 -->
+    <div
+      v-if="mode === 'stops' && stopsList.length"
+      v-auto-animate
+      class="grid grid-rows-3 grid-cols-4 gap-x-6 gap-y-3"
+    >
+      <stop-item v-for="stop in currentStops" :key="`stop${stop.station_id}`" :stop="stop" />
     </div>
 
     <!-- searcher -->

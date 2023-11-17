@@ -1,6 +1,6 @@
 <script setup lang="ts">
 const stopStore = useStopStore()
-const { stops, loaded } = $(storeToRefs(stopStore))
+const { stopsGeoJSON, loaded } = $(storeToRefs(stopStore))
 </script>
 
 <template>
@@ -9,7 +9,7 @@ const { stops, loaded } = $(storeToRefs(stopStore))
     source-id="stops-source"
     :source="{
       type: 'geojson',
-      data: stops,
+      data: stopsGeoJSON,
     }"
   />
 
