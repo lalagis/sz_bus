@@ -6,7 +6,7 @@ export const useConfigStore = defineStore('config', () => {
     style: 'mapbox://styles/cirnoqvq/cloydvrgb00bh01rbglgeauda',
     center: [114.125789, 22.675122],
     minZoom: 8,
-    zoom: 10,
+    zoom: 12,
     boxZoom: false,
     logoPosition: 'bottom-left',
     attributionControl: false,

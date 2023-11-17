@@ -1,37 +1,6 @@
 <script setup lang="ts">
-import type { Feature, FeatureCollection } from 'geojson'
-
-let loaded = $ref(false)
-const stops = $ref<FeatureCollection>({
-  type: 'FeatureCollection',
-  features: [],
-})
-const { data: stopsCSV } = $(await useAsyncData('stops', () => queryContent('/stops').findOne()))
-watchEffect(() => {
-  if (stopsCSV && stopsCSV.body) {
-    // @ts-expect-error has body
-    stopsCSV.body.forEach((stop: Stop) => {
-      const { route_id, line_name, route_name, station_index, station_id, station_name, lng, lat } = stop
-      const item: Feature = {
-        type: 'Feature',
-        properties: {
-          route_id,
-          line_name,
-          route_name,
-          station_index,
-          station_id,
-          station_name,
-        },
-        geometry: {
-          type: 'Point',
-          coordinates: [Number.parseFloat(lng), Number.parseFloat(lat)],
-        },
-      }
-      stops.features.push(item)
-    })
-    loaded = true
-  }
-})
+const stopStore = useStopStore()
+const { stops, loaded } = $(storeToRefs(stopStore))
 </script>
 
 <template>

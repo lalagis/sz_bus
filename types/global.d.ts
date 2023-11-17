@@ -8,3 +8,15 @@ interface Stop {
   lng: string
   lat: string
 }
+
+interface Busline {
+  route_id: string
+  line_name: string
+  route_name: string
+  start_time: string
+  end_time: string
+  first_station: string
+  last_station: string
+  company: string
+  coord_arr: string
+}

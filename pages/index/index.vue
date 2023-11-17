@@ -11,5 +11,6 @@ const config = useConfigStore()
     >
       <sources-and-layers />
     </mapbox-map>
+    <select-panel />
   </div>
 </template>
