@@ -31,7 +31,7 @@ export const useStopStore = defineStore('stop', () => {
     return undefined
   })
 
-  watchEffect(() => {
+  watch(() => selectedStopGeoJSON, () => {
     if (selectedStop && selectedStopGeoJSON) {
       useMapbox('base', (map) => {
         const { lng, lat } = selectedStop

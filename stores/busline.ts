@@ -1,7 +1,10 @@
 import { defineStore } from 'pinia'
-import type { FeatureCollection } from 'geojson'
+import type { Feature, FeatureCollection } from 'geojson'
 
 export const useBuslineStore = defineStore('busline', () => {
+  const stopStore = useStopStore()
+  const { stops } = $(storeToRefs(stopStore))
+
   let buslines = $ref<Busline[]>()
   let loaded = $ref(false)
   const selectedBusline = $ref<Busline>()
@@ -23,14 +26,39 @@ export const useBuslineStore = defineStore('busline', () => {
         const [lng, lat] = lnglat.split('_')
         // @ts-expect-error geometry coordinates
         base.features[0].geometry.coordinates.push([Number.parseFloat(lng), Number.parseFloat(lat)])
+
+        const computedId = lnglat.replace('.', '')
+        const stop = stops.find(row => row.station_id === computedId)
+        if (stop) {
+          const { route_id, line_name, route_name, station_index, station_id, station_name, lng, lat } = stop
+          const item: Feature = {
+            type: 'Feature',
+            properties: {
+              route_id,
+              line_name,
+              route_name,
+              station_index,
+              station_id,
+              station_name,
+              lng,
+              lat,
+            },
+            geometry: {
+              type: 'Point',
+              coordinates: [Number.parseFloat(lng), Number.parseFloat(lat)],
+            },
+          }
+          base.features.push(item)
+        }
       })
+      console.log(base)
       return base
     }
     return undefined
   })
 
-  watchEffect(() => {
-    if (selectedBusline && selectedBuslineGeoJSON) {
+  watch(() => selectedBuslineGeoJSON, () => {
+    if (selectedBuslineGeoJSON) {
       useMapbox('base', (map) => {
         map.flyTo({
           // @ts-expect-error geometry coordinates
