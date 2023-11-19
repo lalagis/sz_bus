@@ -8,6 +8,40 @@ export const useStopStore = defineStore('stop', () => {
     features: [],
   })
   let loaded = $ref(false)
+  const selectedStop = $ref<Stop>()
+  const selectedStopGeoJSON = $computed(() => {
+    const base: FeatureCollection = {
+      type: 'FeatureCollection',
+      features: [{
+        type: 'Feature',
+        properties: {},
+        geometry: {
+          type: 'Point',
+          coordinates: [],
+        },
+      }],
+    }
+    if (selectedStop) {
+      base.features[0].properties = selectedStop
+      const { lng, lat } = selectedStop
+      // @ts-expect-error geometry coordinates
+      base.features[0].geometry.coordinates = [Number.parseFloat(lng), Number.parseFloat(lat)]
+      return base
+    }
+    return undefined
+  })
+
+  watchEffect(() => {
+    if (selectedStop && selectedStopGeoJSON) {
+      useMapbox('base', (map) => {
+        const { lng, lat } = selectedStop
+        map.flyTo({
+          center: [Number.parseFloat(lng), Number.parseFloat(lat)],
+          zoom: 12,
+        })
+      })
+    }
+  })
 
   onMounted(async () => {
     const csv = await queryContent('/stops').findOne()
@@ -39,6 +73,8 @@ export const useStopStore = defineStore('stop', () => {
 
   return $$({
     stops,
+    selectedStop,
+    selectedStopGeoJSON,
     stopsGeoJSON,
     loaded,
   })

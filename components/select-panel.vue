@@ -43,6 +43,8 @@ watchEffect(() => {
 function onClickReset() {
   query = ''
   page = 1
+  stopStore.selectedStop = undefined
+  buslineStore.selectedBusline = undefined
 }
 
 function onToggleMode(incoming: 'buslines' | 'stops') {
@@ -50,6 +52,8 @@ function onToggleMode(incoming: 'buslines' | 'stops') {
   searching = false
   mode = incoming
   page = 1
+  stopStore.selectedStop = undefined
+  buslineStore.selectedBusline = undefined
 }
 </script>
 
