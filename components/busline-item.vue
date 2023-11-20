@@ -22,9 +22,9 @@ function onClickItem() {
         {{ name }}
       </p>
     </div>
-    <div class="bg-lime-100 p-1 text-gray whitespace-nowrap flex-1 max-w-[110px] truncate">
-      <p class="select-none">
-        {{ from }}
+    <div class="bg-lime-100 p-1 text-gray whitespace-nowrap flex-1">
+      <p class="select-none max-w-[80px] lg:max-w-[90px] 2xl:max-w-[100px] truncate">
+        {{ from.length > 8 ? `${from.slice(0, 8)}...` : name.length > 5 ? `${from.slice(0, 4)}..` : from }}
       </p>
     </div>
     <div class="bg-orange-100 p-1 text-gray">
@@ -32,9 +32,9 @@ function onClickItem() {
         →
       </p>
     </div>
-    <div class="bg-teal-100 p-1 text-gray rounded-r-md whitespace-nowrap flex-1 max-w-[110px] truncate">
-      <p class="select-none">
-        {{ to }}
+    <div class="bg-teal-100 p-1 text-gray rounded-r-md whitespace-nowrap flex-1">
+      <p class="select-none max-w-[80px] lg:max-w-[90px] 2xl:max-w-[100px] truncate">
+        {{ to.length > 8 ? `${to.slice(0, 8)}...` : name.length > 5 ? `${to.slice(0, 4)}..` : to }}
       </p>
     </div>
   </div>

@@ -103,7 +103,7 @@ function onToggleMode(incoming: 'buslines' | 'stops') {
     <div
       v-if="mode === 'buslines' && buslinesList.length"
       v-auto-animate
-      class="grid grid-rows-3 grid-cols-2 gap-x-6 gap-y-3 ml-auto"
+      class="grid grid-rows-3 grid-cols-2 gap-x-6 gap-y-3 flex-1"
     >
       <busline-item v-for="busline in currentBuslines" :key="`busline${busline.route_id}`" :busline="busline" />
     </div>
@@ -112,7 +112,7 @@ function onToggleMode(incoming: 'buslines' | 'stops') {
     <div
       v-if="mode === 'stops' && stopsList.length"
       v-auto-animate
-      class="grid grid-rows-3 grid-cols-4 gap-x-6 gap-y-3 ml-auto"
+      class="grid grid-rows-3 grid-cols-4 gap-x-6 gap-y-3 mx-auto"
     >
       <stop-item v-for="stop in currentStops" :key="`stop${stop.station_id}`" :stop="stop" />
     </div>
