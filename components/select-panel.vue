@@ -58,7 +58,7 @@ function onToggleMode(incoming: 'buslines' | 'stops') {
 </script>
 
 <template>
-  <div v-auto-animate class="fixed z-10 bg-white rounded-md mt-16 w-[50vw] min-w-4xl inset-x-0 mx-auto px-8 py-6 flex flex-row items-center shadow-md overflow-hidden">
+  <div v-auto-animate class="fixed z-10 bg-white rounded-md mt-16 w-[50vw] min-w-4xl max-w-[60rem] inset-x-0 mx-auto px-8 py-6 flex flex-row items-center shadow-md overflow-hidden">
     <!-- mode -->
     <div v-auto-animate class="w-30 h-30 bg-emerald-100 rounded-md flex-none">
       <div
@@ -78,7 +78,7 @@ function onToggleMode(incoming: 'buslines' | 'stops') {
     </div>
 
     <!-- tools -->
-    <div class="ml-8 grid grid-cols-2 grid-rows-2 gap-y-4 gap-x-6 mr-6 flex-none">
+    <div class="mx-8 grid grid-cols-2 grid-rows-2 gap-y-4 gap-x-6 mr-6 flex-none">
       <div
         class="i-akar-icons:search w-12 h-12 bg-emerald-300 cursor-pointer hover:scale-105 hover:bg-emerald-400 transition-all duration-300"
         @click="searching = !searching"
@@ -103,7 +103,7 @@ function onToggleMode(incoming: 'buslines' | 'stops') {
     <div
       v-if="mode === 'buslines' && buslinesList.length"
       v-auto-animate
-      class="grid grid-rows-3 grid-cols-2 gap-x-6 gap-y-3"
+      class="grid grid-rows-3 grid-cols-2 gap-x-6 gap-y-3 ml-auto"
     >
       <busline-item v-for="busline in currentBuslines" :key="`busline${busline.route_id}`" :busline="busline" />
     </div>
@@ -112,7 +112,7 @@ function onToggleMode(incoming: 'buslines' | 'stops') {
     <div
       v-if="mode === 'stops' && stopsList.length"
       v-auto-animate
-      class="grid grid-rows-3 grid-cols-4 gap-x-6 gap-y-3"
+      class="grid grid-rows-3 grid-cols-4 gap-x-6 gap-y-3 ml-auto"
     >
       <stop-item v-for="stop in currentStops" :key="`stop${stop.station_id}`" :stop="stop" />
     </div>

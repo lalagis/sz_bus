@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import type { Feature, FeatureCollection } from 'geojson'
+import type { FeatureCollection } from 'geojson'
 
 export const useBuslineStore = defineStore('busline', () => {
   const stopStore = useStopStore()
@@ -26,32 +26,29 @@ export const useBuslineStore = defineStore('busline', () => {
         const [lng, lat] = lnglat.split('_')
         // @ts-expect-error geometry coordinates
         base.features[0].geometry.coordinates.push([Number.parseFloat(lng), Number.parseFloat(lat)])
-
-        const computedId = lnglat.replace('.', '')
-        const stop = stops.find(row => row.station_id === computedId)
-        if (stop) {
-          const { route_id, line_name, route_name, station_index, station_id, station_name, lng, lat } = stop
-          const item: Feature = {
+      })
+      return base
+    }
+    return undefined
+  })
+  const relatedStopsGeoJSON = $computed(() => {
+    const base: FeatureCollection = {
+      type: 'FeatureCollection',
+      features: [],
+    }
+    if (selectedBusline) {
+      stops.forEach((stop) => {
+        if (stop.route_id === selectedBusline.route_id) {
+          base.features.push({
             type: 'Feature',
-            properties: {
-              route_id,
-              line_name,
-              route_name,
-              station_index,
-              station_id,
-              station_name,
-              lng,
-              lat,
-            },
+            properties: stop,
             geometry: {
               type: 'Point',
-              coordinates: [Number.parseFloat(lng), Number.parseFloat(lat)],
+              coordinates: [Number.parseFloat(stop.lng), Number.parseFloat(stop.lat)],
             },
-          }
-          base.features.push(item)
+          })
         }
       })
-      console.log(base)
       return base
     }
     return undefined
@@ -63,7 +60,7 @@ export const useBuslineStore = defineStore('busline', () => {
         map.flyTo({
           // @ts-expect-error geometry coordinates
           center: selectedBuslineGeoJSON.features[0].geometry.coordinates[0],
-          zoom: 12,
+          zoom: 15,
         })
       })
     }
@@ -80,6 +77,7 @@ export const useBuslineStore = defineStore('busline', () => {
     buslines,
     selectedBusline,
     selectedBuslineGeoJSON,
+    relatedStopsGeoJSON,
     loaded,
   })
 })

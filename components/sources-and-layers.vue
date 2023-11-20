@@ -3,7 +3,18 @@ const stopStore = useStopStore()
 const { stopsGeoJSON, selectedStopGeoJSON, loaded: stopsLoaded } = $(storeToRefs(stopStore))
 
 const buslineStore = useBuslineStore()
-const { selectedBuslineGeoJSON } = $(storeToRefs(buslineStore))
+const { selectedBuslineGeoJSON, relatedStopsGeoJSON } = $(storeToRefs(buslineStore))
+
+onMounted(() => {
+  useMapbox('base', (map) => {
+    map.loadImage('/stop.png', (e, img) => {
+      if (e)
+        console.error('load image error', e)
+      if (img)
+        map.addImage('stop', img)
+    })
+  })
+})
 </script>
 
 <template>
@@ -35,6 +46,15 @@ const { selectedBuslineGeoJSON } = $(storeToRefs(buslineStore))
     }"
   />
 
+  <mapbox-source
+    v-if="relatedStopsGeoJSON"
+    source-id="related-stops-source"
+    :source="{
+      type: 'geojson',
+      data: relatedStopsGeoJSON,
+    }"
+  />
+
   <mapbox-layer
     v-if="selectedBuslineGeoJSON"
     :layer="{
@@ -63,7 +83,7 @@ const { selectedBuslineGeoJSON } = $(storeToRefs(buslineStore))
           1,
           ['boolean', ['feature-state', 'fadein'], false],
           0.07,
-          0.5, // default
+          0.5,
         ],
         'line-width': [
           'interpolate',
@@ -81,6 +101,153 @@ const { selectedBuslineGeoJSON } = $(storeToRefs(buslineStore))
   />
 
   <mapbox-layer
+    v-if="selectedBuslineGeoJSON"
+    :layer="{
+      id: 'selected-busline-arrows-layer',
+      source: 'selected-busline-source',
+      type: 'symbol',
+      minzoom: 12,
+      layout: {
+        'symbol-placement': 'line',
+        'symbol-spacing': 200,
+        'text-field': '→',
+        'text-size': 16,
+        'text-font': ['DIN Offc Pro Medium', 'Arial Unicode MS Regular'],
+        'text-keep-upright': false,
+        'text-anchor': 'bottom',
+        'text-padding': 0,
+        'text-line-height': 1,
+        'text-offset': [
+          'interpolate',
+          ['linear'],
+          ['zoom'],
+          12,
+          ['literal', [0, 0]],
+          22,
+          ['literal', [0, -2]],
+        ],
+      },
+      paint: {
+        'text-color': '#5301a4',
+        'text-opacity': 0.9,
+        'text-halo-color': '#fff',
+        'text-halo-width': 2,
+        // @ts-expect-error
+        'text-opacity': [
+          'case',
+          ['boolean', ['feature-state', 'fadein'], false],
+          0.1,
+          1,
+        ],
+      },
+    }"
+  />
+
+  <mapbox-layer
+    v-if="selectedBuslineGeoJSON"
+    :layer="{
+      id: 'selected-busline-labels-layer',
+      source: 'selected-busline-source',
+      type: 'symbol',
+      layout: {
+        'symbol-placement': 'line',
+        'symbol-spacing': 300,
+        'text-font': ['DIN Offc Pro Medium', 'Arial Unicode MS Regular'],
+        'text-field': '{line_name}',
+        'text-size': 14,
+        'text-rotation-alignment': 'viewport',
+        'text-padding': 0,
+        'text-line-height': 1,
+      },
+      paint: {
+        'text-color': '#3a6727',
+        'text-halo-color': '#eeffd1',
+        'text-halo-width': 2,
+        'text-opacity': [
+          'case',
+          ['boolean', ['feature-state', 'fadein'], false],
+          0.1,
+          1,
+        ],
+      },
+    }"
+  />
+
+  <!-- selected busline related stops -->
+  <mapbox-layer
+    v-if="relatedStopsGeoJSON"
+    :layer="{
+      id: 'related-stops-layer',
+      source: 'related-stops-source',
+      type: 'symbol',
+      filter: ['any', ['>=', ['zoom'], 14], ['get', 'interchange']],
+      layout: {
+        'visibility': 'visible',
+        'icon-image': 'stop',
+        'icon-size': ['step', ['zoom'], 0.4, 15, 0.5, 16, 0.6],
+        'icon-padding': 0.5,
+        'icon-allow-overlap': true,
+        'text-optional': true,
+        'text-field': [
+          'step',
+          ['zoom'],
+          '',
+          15,
+          ['get', 'line_name'],
+          16,
+          [
+            'format',
+            ['get', 'line_name'],
+            { 'font-scale': 0.8 },
+            '\n',
+            {},
+            ['get', 'station_name'],
+            { 'text-color': '#000' },
+          ],
+        ],
+        'text-size': ['step', ['zoom'], 12, 16, 14],
+        'text-justify': [
+          'case',
+          ['boolean', ['get', 'left'], false],
+          'right',
+          'left',
+        ],
+        'text-anchor': [
+          'case',
+          ['boolean', ['get', 'left'], false],
+          'right',
+          'left',
+        ],
+        'text-offset': [
+          'case',
+          ['boolean', ['get', 'left'], false],
+          ['literal', [-1, 0]],
+          ['literal', [1, 0]],
+        ],
+        'text-padding': 0.5,
+        'text-font': ['DIN Offc Pro Medium', 'Arial Unicode MS Regular'],
+        'text-max-width': 16,
+        'text-line-height': 1.1,
+      },
+      paint: {
+        'icon-opacity': [
+          'interpolate',
+          ['linear'],
+          ['zoom'],
+          8,
+          ['case', ['get', 'interchange'], 1, 0],
+          14,
+          1,
+        ],
+        'text-color': '#f01b48',
+        'text-halo-width': 1,
+        'text-halo-color': '#fff',
+      },
+    }"
+  />
+
+  <!-- selected stop -->
+  <mapbox-layer
     v-if="selectedStopGeoJSON"
     :layer="{
       id: 'selected-stop-layer',
@@ -92,13 +259,35 @@ const { selectedBuslineGeoJSON } = $(storeToRefs(buslineStore))
           ['linear'],
           ['zoom'],
           10,
-          4,
+          [
+            'case',
+            ['boolean', ['feature-state', 'selected'], false],
+            4,
+            0.75,
+          ],
           14,
-          8,
+          4,
+          15,
+          ['case', ['boolean', ['feature-state', 'selected'], false], 12, 6],
         ],
-        'circle-color': '#fff',
-        'circle-stroke-color': '#f01b48',
-        'circle-stroke-width': 5,
+        'circle-color': [
+          'case',
+          ['boolean', ['feature-state', 'selected'], false],
+          '#fff',
+          '#f01b48',
+        ],
+        'circle-stroke-color': [
+          'case',
+          ['boolean', ['feature-state', 'selected'], false],
+          '#f01b48',
+          '#fff',
+        ],
+        'circle-stroke-width': [
+          'case',
+          ['boolean', ['feature-state', 'selected'], false],
+          5,
+          1,
+        ],
         'circle-opacity': [
           'interpolate',
           ['linear'],
@@ -115,7 +304,7 @@ const { selectedBuslineGeoJSON } = $(storeToRefs(buslineStore))
           ['linear'],
           ['zoom'],
           10,
-          1,
+          ['case', ['boolean', ['feature-state', 'selected'], false], 1, 0],
           13.5,
           1,
           14,
@@ -125,6 +314,7 @@ const { selectedBuslineGeoJSON } = $(storeToRefs(buslineStore))
     }"
   />
 
+  <!-- all stops -->
   <mapbox-layer
     v-if="stopsLoaded && !selectedStopGeoJSON && !selectedBuslineGeoJSON"
     :layer="{
