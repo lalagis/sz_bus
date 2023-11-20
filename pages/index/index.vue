@@ -12,5 +12,6 @@ const config = useConfigStore()
       <sources-and-layers />
     </mapbox-map>
     <select-panel />
+    <stops-in-busline-panel />
   </div>
 </template>
