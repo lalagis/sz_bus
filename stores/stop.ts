@@ -37,7 +37,7 @@ export const useStopStore = defineStore('stop', () => {
         const { lng, lat } = selectedStop
         map.flyTo({
           center: [Number.parseFloat(lng), Number.parseFloat(lat)],
-          zoom: 12,
+          zoom: 14,
         })
       })
     }

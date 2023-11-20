@@ -193,8 +193,6 @@ onMounted(() => {
           ['zoom'],
           '',
           15,
-          ['get', 'line_name'],
-          16,
           [
             'format',
             ['get', 'line_name'],
