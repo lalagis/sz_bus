@@ -1,9 +1,9 @@
 import { defineStore } from 'pinia'
-import type { FeatureCollection } from 'geojson'
+import type { Feature, FeatureCollection } from 'geojson'
 
 export const useBuslineStore = defineStore('busline', () => {
   const stopStore = useStopStore()
-  const { stops } = $(storeToRefs(stopStore))
+  const { stops, selectedStop } = $(storeToRefs(stopStore))
 
   let buslines = $ref<Busline[]>()
   let loaded = $ref(false)
@@ -60,7 +60,7 @@ export const useBuslineStore = defineStore('busline', () => {
   })
 
   watch(() => selectedBuslinesGeoJSON, () => {
-    if (selectedBuslinesGeoJSON) {
+    if (selectedBuslinesGeoJSON && !selectedStop) {
       const len = selectedBuslinesGeoJSON.features.length
       useMapbox('base', (map) => {
         map.flyTo({

@@ -46,9 +46,15 @@ export const useStopStore = defineStore('stop', () => {
   onMounted(async () => {
     const csv = await queryContent('/stops').findOne()
     if (csv.body) {
+      const map = new Map<string, boolean>()
       // @ts-expect-error has body
       csv.body.forEach((stop: Stop) => {
         stops.push(stop)
+        // check if the stop is already in the map
+        if (map.has(stop.station_id))
+          return
+        map.set(stop.station_id, true)
+
         const { route_id, line_name, route_name, station_index, station_id, station_name, lng, lat } = stop
         const item: Feature = {
           type: 'Feature',

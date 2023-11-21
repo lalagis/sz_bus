@@ -4,17 +4,6 @@ const { stopsGeoJSON, selectedStopGeoJSON, loaded: stopsLoaded } = $(storeToRefs
 
 const buslineStore = useBuslineStore()
 const { selectedBuslinesGeoJSON, relatedStopsGeoJSON } = $(storeToRefs(buslineStore))
-
-onMounted(() => {
-  useMapbox('base', (map) => {
-    map.loadImage('/stop.png', (e, img) => {
-      if (e)
-        console.error('load image error', e)
-      if (img)
-        map.addImage('stop', img)
-    })
-  })
-})
 </script>
 
 <template>
@@ -250,64 +239,52 @@ onMounted(() => {
     :layer="{
       id: 'selected-stop-layer',
       source: 'selected-stop-source',
-      type: 'circle',
-      paint: {
-        'circle-radius': [
-          'interpolate',
-          ['linear'],
+      type: 'symbol',
+      layout: {
+        'icon-image': 'stop-end',
+        'icon-size': [
+          'step',
           ['zoom'],
+          0.3,
           10,
-          [
-            'case',
-            ['boolean', ['feature-state', 'selected'], false],
-            4,
-            0.75,
-          ],
-          14,
-          4,
+          0.45,
           15,
-          ['case', ['boolean', ['feature-state', 'selected'], false], 12, 6],
+          0.6,
         ],
-        'circle-color': [
+        'icon-anchor': 'center',
+        'icon-padding': 0.5,
+        'icon-allow-overlap': true,
+        'icon-ignore-placement': true,
+        'text-optional': true,
+        'text-justify': [
           'case',
-          ['boolean', ['feature-state', 'selected'], false],
-          '#fff',
-          '#f01b48',
+          ['boolean', ['get', 'left'], false],
+          'right',
+          'left',
         ],
-        'circle-stroke-color': [
+        'text-anchor': [
           'case',
-          ['boolean', ['feature-state', 'selected'], false],
-          '#f01b48',
-          '#fff',
+          ['boolean', ['get', 'left'], false],
+          'right',
+          'left',
         ],
-        'circle-stroke-width': [
+        'text-offset': [
           'case',
-          ['boolean', ['feature-state', 'selected'], false],
-          5,
-          1,
+          ['boolean', ['get', 'left'], false],
+          ['literal', [-1, 0]],
+          ['literal', [1, 0]],
         ],
-        'circle-opacity': [
-          'interpolate',
-          ['linear'],
-          ['zoom'],
-          10,
-          1,
-          13.9,
-          1,
-          14,
-          0.5,
-        ],
-        'circle-stroke-opacity': [
-          'interpolate',
-          ['linear'],
-          ['zoom'],
-          10,
-          ['case', ['boolean', ['feature-state', 'selected'], false], 1, 0],
-          13.5,
-          1,
-          14,
-          0.5,
-        ],
+        'text-padding': 0.5,
+        'text-font': ['DIN Offc Pro Medium', 'Arial Unicode MS Regular'],
+        'text-max-width': 16,
+        'text-line-height': 1.1,
+        'text-field': ['get', 'station_name'],
+        'text-size': 16,
+      },
+      paint: {
+        'text-color': '#67848A',
+        'text-halo-width': 1,
+        'text-halo-color': '#fff',
       },
     }"
   />
