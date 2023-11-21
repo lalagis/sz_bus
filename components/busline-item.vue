@@ -5,8 +5,10 @@ const from = $computed(() => props.busline.first_station)
 const to = $computed(() => props.busline.last_station)
 
 const buslineStore = useBuslineStore()
+const stopStore = useStopStore()
 
 function onClickItem() {
+  stopStore.selectedStop = undefined
   buslineStore.selectedBuslines = [props.busline]
 }
 </script>
