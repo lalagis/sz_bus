@@ -7,25 +7,28 @@ export const useBuslineStore = defineStore('busline', () => {
 
   let buslines = $ref<Busline[]>()
   let loaded = $ref(false)
-  const selectedBusline = $ref<Busline>()
-  const selectedBuslineGeoJSON = $computed(() => {
+  const selectedBuslines = $ref<Busline[]>([])
+  const selectedBuslinesGeoJSON = $computed(() => {
     const base: FeatureCollection = {
       type: 'FeatureCollection',
-      features: [{
-        type: 'Feature',
-        properties: {},
-        geometry: {
-          type: 'LineString',
-          coordinates: [],
-        },
-      }],
+      features: [],
     }
-    if (selectedBusline) {
-      base.features[0].properties = selectedBusline
-      selectedBusline.coord_arr.split('|').forEach((lnglat) => {
-        const [lng, lat] = lnglat.split('_')
-        // @ts-expect-error geometry coordinates
-        base.features[0].geometry.coordinates.push([Number.parseFloat(lng), Number.parseFloat(lat)])
+    if (selectedBuslines.length) {
+      selectedBuslines.forEach((busline) => {
+        const feature: Feature = {
+          type: 'Feature',
+          properties: busline,
+          geometry: {
+            type: 'LineString',
+            coordinates: [],
+          },
+        }
+        busline.coord_arr.split('|').forEach((lnglat) => {
+          const [lng, lat] = lnglat.split('_')
+          // @ts-expect-error geometry coordinates
+          feature.geometry.coordinates.push([Number.parseFloat(lng), Number.parseFloat(lat)])
+        })
+        base.features.push(feature)
       })
       return base
     }
@@ -36,31 +39,34 @@ export const useBuslineStore = defineStore('busline', () => {
       type: 'FeatureCollection',
       features: [],
     }
-    if (selectedBusline) {
-      stops.forEach((stop) => {
-        if (stop.route_id === selectedBusline.route_id) {
-          base.features.push({
-            type: 'Feature',
-            properties: stop,
-            geometry: {
-              type: 'Point',
-              coordinates: [Number.parseFloat(stop.lng), Number.parseFloat(stop.lat)],
-            },
-          })
-        }
+    if (selectedBuslines.length) {
+      selectedBuslines.forEach((busline) => {
+        stops.forEach((stop) => {
+          if (stop.route_id === busline.route_id) {
+            base.features.push({
+              type: 'Feature',
+              properties: stop,
+              geometry: {
+                type: 'Point',
+                coordinates: [Number.parseFloat(stop.lng), Number.parseFloat(stop.lat)],
+              },
+            })
+          }
+        })
       })
       return base
     }
     return undefined
   })
 
-  watch(() => selectedBuslineGeoJSON, () => {
-    if (selectedBuslineGeoJSON) {
+  watch(() => selectedBuslinesGeoJSON, () => {
+    if (selectedBuslinesGeoJSON) {
+      const len = selectedBuslinesGeoJSON.features.length
       useMapbox('base', (map) => {
         map.flyTo({
           // @ts-expect-error geometry coordinates
-          center: selectedBuslineGeoJSON.features[0].geometry.coordinates[0],
-          zoom: 15,
+          center: selectedBuslinesGeoJSON.features[len - 1].geometry.coordinates[0],
+          zoom: 14,
         })
       })
     }
@@ -75,8 +81,8 @@ export const useBuslineStore = defineStore('busline', () => {
 
   return $$({
     buslines,
-    selectedBusline,
-    selectedBuslineGeoJSON,
+    selectedBuslines,
+    selectedBuslinesGeoJSON,
     relatedStopsGeoJSON,
     loaded,
   })

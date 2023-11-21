@@ -3,9 +3,23 @@ const props = defineProps<{ stop: Stop }>()
 const name = $computed(() => props.stop.station_name)
 
 const stopStore = useStopStore()
+const { stops } = $(storeToRefs(stopStore))
+
+const buslineStore = useBuslineStore()
+const { buslines } = $(storeToRefs(buslineStore))
 
 function onClickItem() {
   stopStore.selectedStop = props.stop
+  if (!buslines)
+    return
+  const result: Busline[] = []
+  stops.filter(item => item.station_id === props.stop.station_id).forEach((stop) => {
+    buslines.forEach((busline) => {
+      if (stop.route_id === busline.route_id)
+        result.push(busline)
+    })
+  })
+  buslineStore.selectedBuslines = result
 }
 </script>
 

@@ -3,7 +3,7 @@ const stopStore = useStopStore()
 const { stopsGeoJSON, selectedStopGeoJSON, loaded: stopsLoaded } = $(storeToRefs(stopStore))
 
 const buslineStore = useBuslineStore()
-const { selectedBuslineGeoJSON, relatedStopsGeoJSON } = $(storeToRefs(buslineStore))
+const { selectedBuslinesGeoJSON, relatedStopsGeoJSON } = $(storeToRefs(buslineStore))
 
 onMounted(() => {
   useMapbox('base', (map) => {
@@ -37,11 +37,11 @@ onMounted(() => {
   />
 
   <mapbox-source
-    v-if="selectedBuslineGeoJSON"
-    source-id="selected-busline-source"
+    v-if="selectedBuslinesGeoJSON"
+    source-id="selected-buslines-source"
     :source="{
       type: 'geojson',
-      data: selectedBuslineGeoJSON,
+      data: selectedBuslinesGeoJSON,
       lineMetrics: true,
     }"
   />
@@ -56,10 +56,10 @@ onMounted(() => {
   />
 
   <mapbox-layer
-    v-if="selectedBuslineGeoJSON"
+    v-if="selectedBuslinesGeoJSON"
     :layer="{
-      id: 'selected-busline-layer',
-      source: 'selected-busline-source',
+      id: 'selected-buslines-layer',
+      source: 'selected-buslines-source',
       type: 'line',
       layout: {
         'line-cap': 'round',
@@ -101,10 +101,10 @@ onMounted(() => {
   />
 
   <mapbox-layer
-    v-if="selectedBuslineGeoJSON"
+    v-if="selectedBuslinesGeoJSON"
     :layer="{
-      id: 'selected-busline-arrows-layer',
-      source: 'selected-busline-source',
+      id: 'selected-buslines-arrows-layer',
+      source: 'selected-buslines-source',
       type: 'symbol',
       minzoom: 12,
       layout: {
@@ -144,10 +144,10 @@ onMounted(() => {
   />
 
   <mapbox-layer
-    v-if="selectedBuslineGeoJSON"
+    v-if="selectedBuslinesGeoJSON"
     :layer="{
-      id: 'selected-busline-labels-layer',
-      source: 'selected-busline-source',
+      id: 'selected-buslines-labels-layer',
+      source: 'selected-buslines-source',
       type: 'symbol',
       layout: {
         'symbol-placement': 'line',
@@ -314,7 +314,7 @@ onMounted(() => {
 
   <!-- all stops -->
   <mapbox-layer
-    v-if="stopsLoaded && !selectedStopGeoJSON && !selectedBuslineGeoJSON"
+    v-if="stopsLoaded && !selectedStopGeoJSON && !selectedBuslinesGeoJSON"
     :layer="{
       id: 'stops-layer',
       source: 'stops-source',

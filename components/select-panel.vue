@@ -44,7 +44,7 @@ function onClickReset() {
   query = ''
   page = 1
   stopStore.selectedStop = undefined
-  buslineStore.selectedBusline = undefined
+  buslineStore.selectedBuslines = []
 }
 
 function onToggleMode(incoming: 'buslines' | 'stops') {
@@ -53,14 +53,14 @@ function onToggleMode(incoming: 'buslines' | 'stops') {
   mode = incoming
   page = 1
   stopStore.selectedStop = undefined
-  buslineStore.selectedBusline = undefined
+  buslineStore.selectedBuslines = []
 }
 </script>
 
 <template>
-  <div v-auto-animate class="fixed z-10 bg-white rounded-md mt-16 w-[50vw] min-w-4xl max-w-[60rem] inset-x-0 mx-auto px-8 py-6 flex flex-row items-center shadow-md overflow-hidden">
+  <div v-auto-animate class="fixed z-10 bg-white rounded-md sm:mt-16 sm:w-[50vw] w-full sm:min-w-xl lg:min-w-4xl lg:max-w-[60rem] inset-x-0 mx-auto px-8 py-6 sm:flex sm:flex-row sm:items-center shadow-md overflow-hidden">
     <!-- mode -->
-    <div v-auto-animate class="w-30 h-30 bg-emerald-100 rounded-md flex-none">
+    <div v-auto-animate class="w-12 h-12 sm:w-18 sm:h-18 md:w-24 md:h-24 lg:w-30 lg:h-30 bg-emerald-100 rounded-md flex-none inline-flex">
       <div
         class="absolute cursor-pointer transition-all duration-300"
         :class="mode === 'buslines' ? 'top-0 left-0 w-full h-full p-0 hover:bg-emerald-400 rounded-md' : 'bottom-0 right-0 w-2/5 h-2/5 bg-emerald-300 rounded-rb-md hover:scale-110 z-10 p-1'"
@@ -78,23 +78,23 @@ function onToggleMode(incoming: 'buslines' | 'stops') {
     </div>
 
     <!-- tools -->
-    <div class="mx-8 grid grid-cols-2 grid-rows-2 gap-y-4 gap-x-6 mr-6 flex-none">
+    <div class="mx-8 sm:grid sm:grid-cols-2 sm:grid-rows-2 sm:gap-y-4 sm:gap-x-6 sm:mr-6 sm:flex-none flex flex-row gap-x-6 inline-flex">
       <div
-        class="i-akar-icons:search w-12 h-12 bg-emerald-300 cursor-pointer hover:scale-105 hover:bg-emerald-400 transition-all duration-300"
+        class="i-akar-icons:search w-6 h-6 sm:w-10 sm:h-10 md:w-12 md:h-12 bg-emerald-300 cursor-pointer hover:scale-105 hover:bg-emerald-400 transition-all duration-300"
         @click="searching = !searching"
       />
       <div
-        v-if="page > 1"
-        class="i-akar-icons:arrow-left-thick w-12 h-12 bg-emerald-300 cursor-pointer hover:scale-105 hover:bg-emerald-400 transition-all duration-300"
-        @click="page--"
-      />
-      <div
-        class="i-akar-icons:arrow-counter-clockwise w-12 h-12 bg-emerald-300 cursor-pointer hover:scale-105 hover:bg-emerald-400 transition-all duration-300"
+        class="i-akar-icons:arrow-counter-clockwise w-6 h-6 sm:w-10 sm:h-10 md:w-12 md:h-12 bg-emerald-300 cursor-pointer hover:scale-105 hover:bg-emerald-400 transition-all duration-300"
         @click="onClickReset"
       />
       <div
+        v-if="page > 1"
+        class="i-akar-icons:arrow-left-thick w-6 h-6 sm:w-10 sm:h-10 md:w-12 md:h-12 bg-emerald-300 cursor-pointer hover:scale-105 hover:bg-emerald-400 transition-all duration-300"
+        @click="page--"
+      />
+      <div
         v-if="mode === 'buslines' ? (buslinesList && page * 6 + 1 <= buslinesList.length) : (stopsList && page * 12 + 1 <= stopsList.length)"
-        class="i-akar-icons:arrow-right-thick w-12 h-12 bg-emerald-300 cursor-pointer hover:scale-105 hover:bg-emerald-400 transition-all duration-300"
+        class="i-akar-icons:arrow-right-thick w-6 h-6 sm:w-10 sm:h-10 md:w-12 md:h-12 bg-emerald-300 cursor-pointer hover:scale-105 hover:bg-emerald-400 transition-all duration-300"
         @click="page++"
       />
     </div>
@@ -103,7 +103,7 @@ function onToggleMode(incoming: 'buslines' | 'stops') {
     <div
       v-if="mode === 'buslines' && buslinesList.length"
       v-auto-animate
-      class="grid grid-rows-3 grid-cols-2 gap-x-6 gap-y-3 flex-1"
+      class="flex flex-row flex-wrap gap-y-2 sm:grid my-2 sm:my-0 sm:grid-rows-3 sm:grid-cols-2 sm:gap-x-6 sm:gap-y-3 sm:flex-1"
     >
       <busline-item v-for="busline in currentBuslines" :key="`busline${busline.route_id}`" :busline="busline" />
     </div>
@@ -125,7 +125,10 @@ function onToggleMode(incoming: 'buslines' | 'stops') {
 
     <!-- footer -->
     <footer class="absolute right-0 bottom-0 mr-2 mb-1 flex flex-row items-center">
-      <a href="https://github.com/lalagis/sz_bus">
+      <a href="/analysis.html">
+        <div class="i-akar-icons:align-bottom" />
+      </a>
+      <a href="https://github.com/lalagis/sz_bus" class="ml-2">
         <div class="i-akar-icons:github-fill" />
       </a>
       <p class="ml-2 text-gray text-sm cursor-default">
