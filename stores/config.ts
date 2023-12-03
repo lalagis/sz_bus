@@ -1,3 +1,4 @@
+// 设置仓库，用于存储全局配置
 import type { MapboxComponentOptions } from 'nuxt-mapbox'
 import { defineStore } from 'pinia'
 

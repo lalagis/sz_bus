@@ -1,12 +1,16 @@
+<!-- mapbox的数据源以及图层源，在地图上绘制的样式根据规范传入即可改变绘制样式 -->
 <script setup lang="ts">
+// 站点仓库
 const stopStore = useStopStore()
 const { stopsGeoJSON, selectedStopGeoJSON, loaded: stopsLoaded } = $(storeToRefs(stopStore))
 
+// 线路仓库
 const buslineStore = useBuslineStore()
 const { selectedBuslinesGeoJSON, relatedStopsGeoJSON } = $(storeToRefs(buslineStore))
 </script>
 
 <template>
+  <!-- 全部站点的数据源 -->
   <mapbox-source
     v-if="stopsLoaded"
     source-id="stops-source"
@@ -16,6 +20,7 @@ const { selectedBuslinesGeoJSON, relatedStopsGeoJSON } = $(storeToRefs(buslineSt
     }"
   />
 
+  <!-- 当前被选中站点的数据源 -->
   <mapbox-source
     v-if="selectedStopGeoJSON"
     source-id="selected-stop-source"
@@ -25,6 +30,7 @@ const { selectedBuslinesGeoJSON, relatedStopsGeoJSON } = $(storeToRefs(buslineSt
     }"
   />
 
+  <!-- 当前被选中线路的数据源 -->
   <mapbox-source
     v-if="selectedBuslinesGeoJSON"
     source-id="selected-buslines-source"
@@ -35,6 +41,7 @@ const { selectedBuslinesGeoJSON, relatedStopsGeoJSON } = $(storeToRefs(buslineSt
     }"
   />
 
+  <!-- 当前被选中线路的相关站点的数据源 -->
   <mapbox-source
     v-if="relatedStopsGeoJSON"
     source-id="related-stops-source"
@@ -44,6 +51,7 @@ const { selectedBuslinesGeoJSON, relatedStopsGeoJSON } = $(storeToRefs(buslineSt
     }"
   />
 
+  <!-- 当前被选中线路的相关站点的图层 -->
   <mapbox-layer
     v-if="selectedBuslinesGeoJSON"
     :layer="{
@@ -89,6 +97,7 @@ const { selectedBuslinesGeoJSON, relatedStopsGeoJSON } = $(storeToRefs(buslineSt
     }"
   />
 
+  <!-- 被选中线路的箭头图层 -->
   <mapbox-layer
     v-if="selectedBuslinesGeoJSON"
     :layer="{
@@ -132,6 +141,7 @@ const { selectedBuslinesGeoJSON, relatedStopsGeoJSON } = $(storeToRefs(buslineSt
     }"
   />
 
+  <!-- 被选中线路的图标图层 -->
   <mapbox-layer
     v-if="selectedBuslinesGeoJSON"
     :layer="{
@@ -162,7 +172,7 @@ const { selectedBuslinesGeoJSON, relatedStopsGeoJSON } = $(storeToRefs(buslineSt
     }"
   />
 
-  <!-- selected busline related stops -->
+  <!-- 被选中线路，相关站点的图标图层 -->
   <mapbox-layer
     v-if="relatedStopsGeoJSON"
     :layer="{
@@ -233,7 +243,7 @@ const { selectedBuslinesGeoJSON, relatedStopsGeoJSON } = $(storeToRefs(buslineSt
     }"
   />
 
-  <!-- selected stop -->
+  <!-- 当前被选中的站点图标图层 -->
   <mapbox-layer
     v-if="selectedStopGeoJSON"
     :layer="{
@@ -289,7 +299,7 @@ const { selectedBuslinesGeoJSON, relatedStopsGeoJSON } = $(storeToRefs(buslineSt
     }"
   />
 
-  <!-- all stops -->
+  <!-- 全部站点的图层 -->
   <mapbox-layer
     v-if="stopsLoaded && !selectedStopGeoJSON && !selectedBuslinesGeoJSON"
     :layer="{

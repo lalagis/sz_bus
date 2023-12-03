@@ -1,3 +1,4 @@
+// 站点类型
 interface Stop {
   route_id: string
   line_name: string
@@ -9,6 +10,7 @@ interface Stop {
   lat: string
 }
 
+// 线路类型
 interface Busline {
   route_id: string
   line_name: string

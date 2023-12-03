@@ -1,3 +1,4 @@
+<!-- 利用left和top来实现偏移量offset -->
 <script setup lang="ts">
 defineProps<{
   show: boolean

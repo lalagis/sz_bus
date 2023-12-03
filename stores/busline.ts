@@ -1,13 +1,19 @@
+// 线路仓库
 import { defineStore } from 'pinia'
 import type { Feature, FeatureCollection } from 'geojson'
 
 export const useBuslineStore = defineStore('busline', () => {
+  // 站点仓库
   const stopStore = useStopStore()
   const { stops, selectedStop } = $(storeToRefs(stopStore))
 
+  // 全部线路
   let buslines = $ref<Busline[]>()
+  // 是否加载完成
   let loaded = $ref(false)
+  // 选中的线路与geojson
   const selectedBuslines = $ref<Busline[]>([])
+  // 一旦有选中的线路，就将线路信息设置到geojson中
   const selectedBuslinesGeoJSON = $computed(() => {
     const base: FeatureCollection = {
       type: 'FeatureCollection',
@@ -34,6 +40,7 @@ export const useBuslineStore = defineStore('busline', () => {
     }
     return undefined
   })
+  // 一旦有选中的线路，就将线路相关的站点信息设置到geojson中
   const relatedStopsGeoJSON = $computed(() => {
     const base: FeatureCollection = {
       type: 'FeatureCollection',
@@ -59,6 +66,7 @@ export const useBuslineStore = defineStore('busline', () => {
     return undefined
   })
 
+  // 一旦有选中的线路，就将地图中心移动到选中的线路
   watch(() => selectedBuslinesGeoJSON, () => {
     if (selectedBuslinesGeoJSON && !selectedStop) {
       const len = selectedBuslinesGeoJSON.features.length
@@ -72,7 +80,9 @@ export const useBuslineStore = defineStore('busline', () => {
     }
   })
 
+  // 当被挂载时
   onMounted(async () => {
+    // 从服务器获取线路数据
     const csv = await queryContent('/buslines').findOne()
     if (csv.body)
       buslines = csv.body as unknown as Busline[]

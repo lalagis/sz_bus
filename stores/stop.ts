@@ -1,15 +1,21 @@
+// 站点仓库
 import { defineStore } from 'pinia'
 import type { Feature, FeatureCollection } from 'geojson'
 
 export const useStopStore = defineStore('stop', () => {
+  // 全部站点与geojson
   const stops = $ref<Stop[]>([])
   const stopsGeoJSON = $ref<FeatureCollection>({
     type: 'FeatureCollection',
     features: [],
   })
+  // 数据是否加载完成
   let loaded = $ref(false)
+  // 选中的站点与geojson
   const selectedStop = $ref<Stop>()
+  // 一旦有选中的站点，就将站点信息设置到geojson中
   const selectedStopGeoJSON = $computed(() => {
+    // geojson模板
     const base: FeatureCollection = {
       type: 'FeatureCollection',
       features: [{
@@ -31,6 +37,7 @@ export const useStopStore = defineStore('stop', () => {
     return undefined
   })
 
+  // 一旦有选中的站点，就将地图中心移动到选中的站点
   watch(() => selectedStopGeoJSON, () => {
     if (selectedStop && selectedStopGeoJSON) {
       useMapbox('base', (map) => {
@@ -43,9 +50,12 @@ export const useStopStore = defineStore('stop', () => {
     }
   })
 
+  // 当被挂载时
   onMounted(async () => {
+    // 从服务器获取站点数据
     const csv = await queryContent('/stops').findOne()
     if (csv.body) {
+      // 用于去重
       const map = new Map<string, boolean>()
       // @ts-expect-error has body
       csv.body.forEach((stop: Stop) => {
@@ -55,6 +65,7 @@ export const useStopStore = defineStore('stop', () => {
           return
         map.set(stop.station_id, true)
 
+        // 填入基本信息
         const { route_id, line_name, route_name, station_index, station_id, station_name, lng, lat } = stop
         const item: Feature = {
           type: 'Feature',
@@ -74,6 +85,7 @@ export const useStopStore = defineStore('stop', () => {
         stopsGeoJSON.features.push(item)
       })
     }
+    // 设置加载状态
     loaded = true
   })
 
