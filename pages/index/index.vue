@@ -4,8 +4,6 @@ import { useDrawRelatedStops } from '~/hooks/useDrawRelatedStops'
 
 // 仓库中的数据
 const config = useConfigStore()
-const stopStore = useStopStore()
-const { stops } = $(storeToRefs(stopStore))
 
 // 复用的方法，用于绘制一个站点的相关站点与线路
 const drawRelatedStops = useDrawRelatedStops()
@@ -82,16 +80,19 @@ onMounted(() => {
         layers: ['stops-layer'],
         validate: false,
       })
-      if (features.length) {
-        // 在全部站点stops里面拿到它，并计算与它相关的全部站点
-        stops.some((stop) => {
-          if (stop.station_id === features[0]?.properties?.station_id) {
-            drawRelatedStops(stop)
-            return true
-          }
-          return false
-        })
+      const stop: Stop = {
+        route_id: features[0].properties?.route_id,
+        station_id: features[0].properties?.station_id,
+        station_name: features[0].properties?.station_name,
+        line_name: features[0].properties?.line_name,
+        route_name: features[0].properties?.route_name,
+        station_index: features[0].properties?.station_index,
+        // @ts-expect-error has coordinates
+        lng: features[0].geometry?.coordinates[0],
+        // @ts-expect-error has coordinates
+        lat: features[0].geometry?.coordinates[1],
       }
+      drawRelatedStops(stop)
     })
   })
 })

@@ -52,7 +52,7 @@ function onClickReset() {
   query = ''
   page = 1
   stopStore.selectedStop = undefined
-  buslineStore.selectedBuslines = []
+  buslineStore.selectedBuslines = undefined
 }
 
 // 当切换模式时，也需要进行一些重制
@@ -62,7 +62,7 @@ function onToggleMode(incoming: 'buslines' | 'stops') {
   mode = incoming
   page = 1
   stopStore.selectedStop = undefined
-  buslineStore.selectedBuslines = []
+  buslineStore.selectedBuslines = undefined
 }
 </script>
 

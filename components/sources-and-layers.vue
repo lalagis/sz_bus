@@ -12,7 +12,6 @@ const { selectedBuslinesGeoJSON, relatedStopsGeoJSON } = $(storeToRefs(buslineSt
 <template>
   <!-- 全部站点的数据源 -->
   <mapbox-source
-    v-if="stopsLoaded"
     source-id="stops-source"
     :source="{
       type: 'geojson',
@@ -22,7 +21,6 @@ const { selectedBuslinesGeoJSON, relatedStopsGeoJSON } = $(storeToRefs(buslineSt
 
   <!-- 当前被选中站点的数据源 -->
   <mapbox-source
-    v-if="selectedStopGeoJSON"
     source-id="selected-stop-source"
     :source="{
       type: 'geojson',
@@ -32,7 +30,6 @@ const { selectedBuslinesGeoJSON, relatedStopsGeoJSON } = $(storeToRefs(buslineSt
 
   <!-- 当前被选中线路的数据源 -->
   <mapbox-source
-    v-if="selectedBuslinesGeoJSON"
     source-id="selected-buslines-source"
     :source="{
       type: 'geojson',
@@ -43,7 +40,6 @@ const { selectedBuslinesGeoJSON, relatedStopsGeoJSON } = $(storeToRefs(buslineSt
 
   <!-- 当前被选中线路的相关站点的数据源 -->
   <mapbox-source
-    v-if="relatedStopsGeoJSON"
     source-id="related-stops-source"
     :source="{
       type: 'geojson',

@@ -12,14 +12,14 @@ export const useBuslineStore = defineStore('busline', () => {
   // 是否加载完成
   let loaded = $ref(false)
   // 选中的线路与geojson
-  const selectedBuslines = $ref<Busline[]>([])
+  const selectedBuslines = $ref<Busline[] | undefined>([])
   // 一旦有选中的线路，就将线路信息设置到geojson中
   const selectedBuslinesGeoJSON = $computed(() => {
     const base: FeatureCollection = {
       type: 'FeatureCollection',
       features: [],
     }
-    if (selectedBuslines.length) {
+    if (selectedBuslines && selectedBuslines.length) {
       selectedBuslines.forEach((busline) => {
         const feature: Feature = {
           type: 'Feature',
@@ -46,7 +46,7 @@ export const useBuslineStore = defineStore('busline', () => {
       type: 'FeatureCollection',
       features: [],
     }
-    if (selectedBuslines.length) {
+    if (selectedBuslines && selectedBuslines.length) {
       selectedBuslines.forEach((busline) => {
         stops.forEach((stop) => {
           if (stop.route_id === busline.route_id) {
